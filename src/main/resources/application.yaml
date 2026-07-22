@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: generator
+
+server:
+  port: 9090

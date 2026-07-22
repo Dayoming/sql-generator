@@ -1,0 +1,442 @@
+:root {
+  --bg: #f4f6fb;
+  --card-bg: #ffffff;
+  --border: #e2e5ec;
+  --text: #1f2430;
+  --text-light: #6b7280;
+  --primary: #4f6df5;
+  --primary-hover: #3f59d9;
+  --accent-bg: #eef1fd;
+  --code-bg: #1e2430;
+  --code-text: #e8ecf1;
+  --radius: 10px;
+  --shadow: 0 2px 10px rgba(20, 25, 40, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Pretendard", "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+header {
+  padding: 28px 32px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+  position: relative;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 24px 32px 40px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.card h2 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card h2 .step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfbfd;
+  color: var(--text);
+  font-family: "JetBrains Mono", "D2Coding", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+textarea:focus {
+  border-color: var(--primary);
+  background: #fff;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    transform 0.05s;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--accent-bg);
+  color: var(--primary);
+}
+
+.btn-secondary:hover {
+  background: #e2e7fb;
+}
+
+#questions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#questions:empty::before {
+  content: "쿼리를 파싱하면 동적 조건 선택 항목이 여기에 표시됩니다.";
+  display: block;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 13px;
+  text-align: center;
+}
+
+.q-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fbfbfd;
+  font-size: 13px;
+}
+
+.q-item .q-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.q-item .q-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent-bg);
+  color: var(--primary);
+  letter-spacing: 0.3px;
+}
+
+.q-item code {
+  background: #eef0f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #d0225a;
+}
+
+.q-item input[type="number"],
+.q-item input[type="text"],
+.q-item input:not([type]) {
+  margin-top: 4px;
+  width: 140px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.q-radio,
+.q-check {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+#result {
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 18px;
+  border-radius: 8px;
+  font-family: "JetBrains Mono", "D2Coding", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  min-height: 260px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+#result:empty::before {
+  content: "생성된 SQL이 여기에 표시됩니다.";
+  color: #7c8494;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.result-header h2 {
+  margin: 0;
+}
+
+/* 클립보드 복사 버튼 */
+.btn-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-bg);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.btn-copy:hover {
+  background: #e2e7fb;
+}
+
+.btn-copy:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none; /* 혹시 모를 클릭 이벤트까지 이중 차단 */
+}
+
+.btn-copy.copied {
+  background: #e8f8ee;
+  border-color: #b8e6c8;
+  color: #1f9d55;
+}
+
+.btn-copy svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 설정 버튼 (헤더) */
+.settings-btn {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.settings-btn:hover {
+  background: var(--accent-bg);
+  color: var(--primary);
+}
+
+.settings-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* 모달 */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 25, 40, 0.45);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 40px rgba(20, 25, 40, 0.25);
+  width: 420px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.modal-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.modal-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: 18px;
+  padding: 4px;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+.form-row label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-row select,
+.form-row input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+  background: #fbfbfd;
+}
+
+.form-row .hint {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #1f2430;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+  z-index: 200;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
