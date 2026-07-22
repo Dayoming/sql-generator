@@ -440,3 +440,19 @@ button:active {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* 하위 item */
+.q-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fbfbfd;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+/* depth가 깊어질수록 왼쪽에 연결선 느낌의 보더 추가 */
+.q-item.nested {
+  border-left: 3px solid var(--primary);
+  background: var(--accent-bg);
+}

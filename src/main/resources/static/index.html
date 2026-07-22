@@ -285,8 +285,12 @@
       }
 
       // 트리를 재귀 순회하며 IF/CHOOSE/FOREACH/BIND에 대해서만 입력 폼 생성
-      function renderQuestions(node) {
+      function renderQuestions(node, depth = 0) {
         let html = "";
+        const indent = depth * 20; // depth 1당 20px 들여쓰기
+        const nestedClass = depth > 0 ? "nested" : "";
+        const indentStyle = `style="margin-left:${indent}px;"`;
+
         if (node.type === "IF") {
           const key = node.test.trim();
           const groupIds = testGroups[key] || [node.id];
@@ -295,7 +299,7 @@
           if (groupIds[0] === node.id) {
             const idsJson = JSON.stringify(groupIds).replace(/"/g, "&quot;");
             html += `
-        <div class="q-item">
+        <div class="q-item ${nestedClass}" ${indentStyle}>
           <label class="q-label">
             <span class="q-tag">IF</span>
             <input type="checkbox" onchange='setGroupSelection(${idsJson}, this.checked)'>
@@ -322,7 +326,7 @@
               </label>`;
           }
           html += `
-            <div class="q-item">
+            <div class="q-item ${nestedClass}" ${indentStyle}>
               <div class="q-label"><span class="q-tag">CHOOSE</span> 분기 선택</div>
               ${inner}
             </div>`;
@@ -330,7 +334,7 @@
           selections["foreach_" + node.id] = "1";
 
           html += `
-            <div class="q-item">
+            <div class="q-item ${nestedClass}" ${indentStyle}>
               <div class="q-label"><span class="q-tag">FOREACH</span> 반복 횟수</div>
               collection: <code>${node.collection}</code><br>
               <input type="number" min="0" value="1"
@@ -339,15 +343,33 @@
         } else if (node.type === "BIND") {
           const [name] = node.text.split("=");
           html += `
-            <div class="q-item">
+            <div class="q-item ${nestedClass}" ${indentStyle}>
               <div class="q-label"><span class="q-tag">BIND</span> 변수 값</div>
               <code>${name}</code>
               <input type="text" placeholder="값 입력" onchange="paramValues['${name}']=this.value">
             </div>`;
         }
-        (node.children || []).forEach((c) => (html += renderQuestions(c)));
-        (node.whens || []).forEach((w) => (html += renderQuestions(w)));
-        if (node.otherwise) html += renderQuestions(node.otherwise);
+
+        // 태그 종류에 따라 depth를 늘려서 자식에게 전달
+        const childDepth = [
+          "IF",
+          "CHOOSE",
+          "WHEN",
+          "FOREACH",
+          "TRIM",
+          "WHERE",
+          "SET",
+        ].includes(node.type)
+          ? depth + 1
+          : depth;
+
+        (node.children || []).forEach(
+          (c) => (html += renderQuestions(c, childDepth)),
+        );
+        (node.whens || []).forEach(
+          (w) => (html += renderQuestions(w, childDepth)),
+        );
+        if (node.otherwise) html += renderQuestions(node.otherwise, childDepth);
         return html;
       }
       // -------------------- 쿼리 파싱 --------------------
