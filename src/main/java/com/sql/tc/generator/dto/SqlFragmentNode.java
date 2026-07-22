@@ -17,6 +17,8 @@ public class SqlFragmentNode {
     // TRIM/WHERE/SET 전용
     public String prefix;
     public List<String> prefixOverrides;
+    public String suffix;
+    public List<String> suffixOverrides;
 
     // FOREACH 전용
     public String collection, item, index, open, close, separator;

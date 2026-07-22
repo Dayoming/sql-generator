@@ -77,14 +77,35 @@ public class SqlRenderer {
                                 : Optional.empty())
                         .ifPresent(w -> assemble(w, sel, sb));
             }
-            case "WHERE", "TRIM" -> {
+            case "WHERE", "TRIM", "SET" -> {
                 StringBuilder inner = new StringBuilder();
                 node.children.forEach(c -> assemble(c, sel, inner));
                 String body = inner.toString().trim();
                 if (!body.isEmpty()) {
-                    for (String ov : node.prefixOverrides) // "AND ", "OR " 등
-                        if (body.startsWith(ov.trim())) { body = body.substring(ov.trim().length()).trim(); break; }
-                    sb.append(node.prefix).append(" ").append(body).append(" ");
+                    // 앞쪽 접두어 제거 (예: WHERE의 AND/OR)
+                    if (node.prefixOverrides != null) {
+                        for (String ov : node.prefixOverrides) {
+                            String trimmedOv = ov.trim();
+                            if (!trimmedOv.isEmpty() && body.startsWith(trimmedOv)) {
+                                body = body.substring(trimmedOv.length()).trim();
+                                break;
+                            }
+                        }
+                    }
+                    // 뒤쪽 접미어 제거 (예: SET의 마지막 콤마)
+                    if (node.suffixOverrides != null) {
+                        for (String ov : node.suffixOverrides) {
+                            String trimmedOv = ov.trim();
+                            if (!trimmedOv.isEmpty() && body.endsWith(trimmedOv)) {
+                                body = body.substring(0, body.length() - trimmedOv.length()).trim();
+                                break;
+                            }
+                        }
+                    }
+
+                    String prefix = node.prefix != null ? node.prefix : "";
+                    String suffix = node.suffix != null ? node.suffix : "";
+                    sb.append(prefix).append(" ").append(body).append(" ").append(suffix).append(" ");
                 }
             }
             case "FOREACH" -> {
