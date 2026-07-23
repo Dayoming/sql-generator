@@ -64,7 +64,8 @@ public class SqlRenderer {
                 node.children.forEach(c -> assemble(c, sel, sb));
             }
             case "CHOOSE" -> {
-                String chosenId = (String) sel.get(node.id);
+                String rawChosen = (String) sel.get(node.id);
+                String chosenId = (rawChosen instanceof String s) ? s : null;
                 if (chosenId == null) {
                     // 아무 것도 선택하지 않았으면 CHOOSE 블록 전체를 출력하지 않음
                     break;
