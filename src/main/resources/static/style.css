@@ -418,21 +418,28 @@ button:active {
   border-top: 1px solid var(--border);
 }
 
+/* 토스트 */
 .toast {
   position: fixed;
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%) translateY(10px);
-  background: #1f2430;
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 10px;
   font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(20, 25, 40, 0.12);
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 0.2s,
-    transform 0.2s;
+    opacity 0.25s ease,
+    transform 0.25s ease;
   z-index: 200;
 }
 
@@ -441,23 +448,67 @@ button:active {
   transform: translateX(-50%) translateY(0);
 }
 
-/* 하위 item */
-.q-item {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: #fbfbfd;
-  font-size: 13px;
-  margin-bottom: 10px;
+.toast .toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
+.toast .toast-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* 성공 토스트 */
+.toast.success {
+  background: #eafbf1;
+  border-color: #bdeccf;
+  color: #1f7a45;
+}
+
+.toast.success .toast-icon {
+  background: #7ee2a8;
+  color: #145c30;
+}
+
+/* 실패 토스트 */
+.toast.error {
+  background: #fdedec;
+  border-color: #f6c6c2;
+  color: #c0392b;
+}
+
+.toast.error .toast-icon {
+  background: #f5a29b;
+  color: #7a231a;
+}
+
+/* 기본 토스트 */
+.toast.default {
+  background: #eef1fd;
+  border-color: #d3daf7;
+  color: #3f59d9;
+}
+
+.toast.default .toast-icon {
+  background: #a9b8f5;
+  color: #263b9e;
+}
+
+/* 하위 item */
 .q-item.nested {
   border-left: 3px solid var(--primary);
   background: var(--accent-bg);
 }
 
 .q-children {
-  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   transition: opacity 0.15s;
 }
 

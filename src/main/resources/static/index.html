@@ -167,8 +167,10 @@
         </div>
       </div>
     </div>
-    <div class="toast" id="toast">설정이 저장되었습니다</div>
-
+    <div class="toast" id="toast">
+      <span class="toast-icon" id="toastIcon"></span>
+      <span id="toastMessage">설정이 저장되었습니다.</span>
+    </div>
     <script>
       const DEFAULT_FORMAT_OPTIONS = {
         language: "mysql",
@@ -177,7 +179,22 @@
         tabWidth: 4,
         linesBetweenQueries: 2,
       };
+      const TOAST_ICONS = {
+        success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>`,
+        error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>`,
+        default: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>`,
+      };
       const SETTINGS_KEY = "mybatis-sql-formatter-options";
+      const scrollTopBtn = document.getElementById("scrollTopBtn");
       const selections = {}; // { "n2": true/false, "n5": "chosenId", "foreach_n7": 3 }
       const paramValues = {}; // ${} 리터럴 값, <bind> 변수값
       let tree = null;
@@ -225,19 +242,12 @@
         };
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(formatOptions));
         closeSettings();
-        showToast("설정이 저장되었습니다");
+        showToast("설정이 저장되었습니다.");
       }
 
       function resetSettings() {
         formatOptions = { ...DEFAULT_FORMAT_OPTIONS };
         applyOptionsToForm(formatOptions);
-      }
-
-      function showToast(message) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 1800);
       }
 
       // 오버레이 바깥 클릭 시 닫기
@@ -272,21 +282,48 @@
       async function parseQuery() {
         const rawXml = document.getElementById("rawXml").value;
 
+        if (!rawXml.trim()) {
+          showToast("쿼리를 입력해주세요.", "error");
+          return;
+        }
+
         // 새 쿼리를 파싱할 때마다 이전 선택값과 파라미터 값 초기화
         Object.keys(selections).forEach((k) => delete selections[k]);
         Object.keys(paramValues).forEach((k) => delete paramValues[k]);
 
-        const res = await fetch(`/api/parse`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rawXml }),
-        });
-        tree = await res.json();
+        try {
+          const res = await fetch(`/api/parse`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rawXml }),
+          });
 
-        testGroups = {}; // 새 쿼리 파싱 시 그룹 초기화
-        collectIfGroups(tree); // 전체 트리를 훑어 test별로 id 그룹핑
+          if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(errText || `HTTP ${res.status}`);
+          }
 
-        document.getElementById("questions").innerHTML = renderQuestions(tree);
+          tree = await res.json();
+
+          if (!tree) {
+            throw new Error("파싱 결과가 비어 있습니다.");
+          }
+
+          testGroups = {};
+          collectIfGroups(tree);
+
+          document.getElementById("questions").innerHTML =
+            renderQuestions(tree);
+
+          showToast("쿼리 파싱이 완료되었습니다.", "success");
+        } catch (err) {
+          console.error("파싱 실패:", err);
+          document.getElementById("questions").innerHTML = "";
+          showToast(
+            "쿼리 파싱에 실패했습니다. XML 문법을 확인해주세요.",
+            "error",
+          );
+        }
       }
 
       // 트리를 재귀 순회하며 IF/CHOOSE/FOREACH/BIND에 대해서만 입력 폼 생성
@@ -378,9 +415,10 @@
         if (node.otherwise)
           childrenHtml += renderQuestions(node.otherwise, childDepth);
 
-        // IF 노드는 자식들을 흐림 처리 대상 div로 감쌈 (기본 false → 처음부터 dimmed)
         if (node.type === "IF") {
-          html += `<div class="q-children dimmed" id="children-${node.id}">${childrenHtml}</div>`;
+          if (childrenHtml.trim() !== "") {
+            html += `<div class="q-children dimmed" id="children-${node.id}">${childrenHtml}</div>`;
+          }
         } else {
           html += childrenHtml;
         }
@@ -478,6 +516,23 @@
             container.classList.add("dimmed");
           }
         });
+      }
+
+      // 토스트 메시지 출력
+      function showToast(message, type = "default") {
+        const toast = document.getElementById("toast");
+        const icon = document.getElementById("toastIcon");
+        const msg = document.getElementById("toastMessage");
+
+        msg.textContent = message;
+        icon.innerHTML = TOAST_ICONS[type] || TOAST_ICONS.default;
+
+        toast.className = "toast show " + type; // success / error / default 모두 클래스 적용
+
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 1800);
       }
     </script>
   </body>
