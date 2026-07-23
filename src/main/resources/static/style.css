@@ -565,3 +565,32 @@ button:active {
     bottom: 20px;
   }
 }
+
+/* 전체 선택 */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.section-header h2 {
+  margin-top: 0; /* 부모가 margin-top을 담당하므로 h2 자체 margin은 제거 */
+}
+
+.select-all-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-all-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

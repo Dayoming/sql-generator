@@ -41,9 +41,20 @@
           <button class="btn-primary" onclick="parseQuery()">쿼리 파싱</button>
         </div>
 
-        <h2 style="margin-top: 24px">
-          <span class="step">2</span> 동적 조건 선택
-        </h2>
+        <div class="section-header">
+          <h2 style="margin-top: 24px">
+            <span class="step">2</span> 동적 조건 선택
+          </h2>
+
+          <label class="select-all-row">
+            <input
+              type="checkbox"
+              id="selectAllCheckbox"
+              onchange="toggleSelectAll(this.checked)"
+            />
+            전체 선택
+          </label>
+        </div>
         <div id="questions"></div>
       </section>
 
@@ -563,6 +574,36 @@
 
       function scrollToTop() {
         window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // 전체 선택 / 해제
+      function toggleSelectAll(checked) {
+        // 1) 모든 IF 체크박스 처리
+        document
+          .querySelectorAll('#questions input[type="checkbox"]')
+          .forEach((cb) => {
+            cb.checked = checked;
+            cb.dispatchEvent(new Event("change")); // onchange에 연결된 selections/흐림처리 로직을 그대로 재사용
+          });
+
+        // 2) 모든 CHOOSE 라디오 그룹 처리
+        const seenGroups = new Set();
+        document
+          .querySelectorAll('#questions input[type="radio"]')
+          .forEach((radio) => {
+            if (checked) {
+              // 각 CHOOSE 그룹의 첫 번째 WHEN(옵션)을 대표로 선택
+              if (!seenGroups.has(radio.name)) {
+                seenGroups.add(radio.name);
+                radio.checked = true;
+                radio.dispatchEvent(new Event("change"));
+              }
+            } else {
+              // 전체 해제 시 선택 상태와 selections 값을 함께 초기화
+              radio.checked = false;
+              delete selections[radio.name];
+            }
+          });
       }
     </script>
   </body>
