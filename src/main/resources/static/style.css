@@ -451,8 +451,17 @@ button:active {
   margin-bottom: 10px;
 }
 
-/* depth가 깊어질수록 왼쪽에 연결선 느낌의 보더 추가 */
 .q-item.nested {
   border-left: 3px solid var(--primary);
   background: var(--accent-bg);
+}
+
+.q-children {
+  margin-top: 8px;
+  transition: opacity 0.15s;
+}
+
+.q-children.dimmed {
+  opacity: 0.4;
+  pointer-events: none;
 }

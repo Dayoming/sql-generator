@@ -307,7 +307,7 @@
         <div class="q-item ${nestedClass}" ${indentStyle}>
           <label class="q-label">
             <span class="q-tag">IF</span>
-            <input type="checkbox" onchange='setGroupSelection(${idsJson}, this.checked)'>
+            <input type="checkbox" onchange='setGroupSelection(${idsJson}, this.checked); toggleChildrenGroup(${idsJson}, this.checked)'>
             포함 여부
             ${groupIds.length > 1 ? `<span style="font-size:11px; color:var(--text-light);">(쿼리 내 ${groupIds.length}곳에 동시 적용)</span>` : ""}
           </label>
@@ -368,13 +368,22 @@
           ? depth + 1
           : depth;
 
+        let childrenHtml = "";
         (node.children || []).forEach(
-          (c) => (html += renderQuestions(c, childDepth)),
+          (c) => (childrenHtml += renderQuestions(c, childDepth)),
         );
         (node.whens || []).forEach(
-          (w) => (html += renderQuestions(w, childDepth)),
+          (w) => (childrenHtml += renderQuestions(w, childDepth)),
         );
-        if (node.otherwise) html += renderQuestions(node.otherwise, childDepth);
+        if (node.otherwise)
+          childrenHtml += renderQuestions(node.otherwise, childDepth);
+
+        // IF 노드는 자식들을 흐림 처리 대상 div로 감쌈 (기본 false → 처음부터 dimmed)
+        if (node.type === "IF") {
+          html += `<div class="q-children dimmed" id="children-${node.id}">${childrenHtml}</div>`;
+        } else {
+          html += childrenHtml;
+        }
         return html;
       }
       // -------------------- 쿼리 파싱 --------------------
@@ -456,6 +465,19 @@
 
         const clearBtn = document.getElementById("clearBtn");
         clearBtn.disabled = true;
+      }
+
+      // 자식 카드 토글
+      function toggleChildrenGroup(ids, checked) {
+        ids.forEach((id) => {
+          const container = document.getElementById(`children-${id}`);
+          if (!container) return;
+          if (checked) {
+            container.classList.remove("dimmed");
+          } else {
+            container.classList.add("dimmed");
+          }
+        });
       }
     </script>
   </body>
