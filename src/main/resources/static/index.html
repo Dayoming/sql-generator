@@ -457,36 +457,40 @@
       // -------------------- SQL 생성 --------------------
       async function renderQuery() {
         const bindStyle = "POSITIONAL";
+        try {
+          const res = await fetch(`/api/render`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              rawXml: document.getElementById("rawXml").value,
+              selections,
+              paramValues,
+              bindStyle,
+            }),
+          });
+          const data = await res.json();
 
-        const res = await fetch(`/api/render`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            rawXml: document.getElementById("rawXml").value,
-            selections,
-            paramValues,
-            bindStyle,
-          }),
-        });
-        const data = await res.json();
+          const formattedSql = sqlFormatter.format(data.sql, formatOptions);
 
-        const formattedSql = sqlFormatter.format(data.sql, formatOptions);
+          // params 순서 설정
+          const paramList = data.params
+            .map((p, i) => `${i + 1}. ${p}`)
+            .join("\n");
 
-        // params 순서 설정
-        const paramList = data.params
-          .map((p, i) => `${i + 1}. ${p}`)
-          .join("\n");
+          document.getElementById("result").textContent =
+            formattedSql + "\n\n-- Parameters --\n" + paramList;
 
-        document.getElementById("result").textContent =
-          formattedSql + "\n\n-- Parameters --\n" + paramList;
+          // 복사 버튼 활성화 + 복사 대상은 SQL만 (파라미터 목록 제외)
+          const copyBtn = document.getElementById("copyBtn");
+          copyBtn.disabled = false;
+          copyBtn.dataset.sql = formattedSql;
 
-        // 복사 버튼 활성화 + 복사 대상은 SQL만 (파라미터 목록 제외)
-        const copyBtn = document.getElementById("copyBtn");
-        copyBtn.disabled = false;
-        copyBtn.dataset.sql = formattedSql;
-
-        // 초기화 버튼 활성화
-        document.getElementById("clearBtn").disabled = false;
+          // 초기화 버튼 활성화
+          document.getElementById("clearBtn").disabled = false;
+          showToast("SQL이 생성되었습니다.", "success");
+        } catch (err) {
+          showToast("SQL 생성에 실패했습니다.", "error");
+        }
       }
       // -------------------- SQL 생성 --------------------
 
