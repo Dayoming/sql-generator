@@ -171,6 +171,23 @@
       <span class="toast-icon" id="toastIcon"></span>
       <span id="toastMessage">설정이 저장되었습니다.</span>
     </div>
+    <button
+      class="scroll-top-btn"
+      id="scrollTopBtn"
+      onclick="scrollToTop()"
+      aria-label="맨 위로 가기"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+      </svg>
+    </button>
+
     <script>
       const DEFAULT_FORMAT_OPTIONS = {
         language: "mysql",
@@ -533,6 +550,19 @@
         showToast._timer = setTimeout(() => {
           toast.classList.remove("show");
         }, 1800);
+      }
+
+      // 맨 위로 가기 버튼
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 200) {
+          scrollTopBtn.classList.add("show");
+        } else {
+          scrollTopBtn.classList.remove("show");
+        }
+      });
+
+      function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     </script>
   </body>
