@@ -29,7 +29,6 @@ public class MyBatisFragmentParser {
         Configuration configuration = new Configuration();
         XMLScriptBuilder builder = new XMLScriptBuilder(configuration, context);
         SqlSource sqlSource = builder.parseScriptNode();
-        System.out.println("sqlSource class: " + sqlSource.getClass().getName());
         IdGenerator ids = new IdGenerator();
 
         // 동적 태그가 하나도 없는 경우 -> RawSqlSource
