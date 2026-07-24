@@ -357,27 +357,40 @@
       // 트리를 재귀 순회하며 IF/CHOOSE/FOREACH/BIND에 대해서만 입력 폼 생성
       function renderQuestions(node, depth = 0) {
         let html = "";
-        const indent = depth * 20; // depth 1당 20px 들여쓰기
+        const indent = depth * 20;
         const nestedClass = depth > 0 ? "nested" : "";
         const indentStyle = `style="margin-left:${indent}px;"`;
 
         if (node.type === "IF") {
           const key = node.test.trim();
           const groupIds = testGroups[key] || [node.id];
+          const isRepresentative = groupIds[0] === node.id;
 
           selections[node.id] = false;
-          if (groupIds[0] === node.id) {
+
+          if (isRepresentative) {
+            // 그룹의 대표 위치: 실제 체크박스 표시
             const idsJson = JSON.stringify(groupIds).replace(/"/g, "&quot;");
             html += `
-        <div class="q-item ${nestedClass}" ${indentStyle}>
-          <label class="q-label">
-            <span class="q-tag">IF</span>
-            <input type="checkbox" onchange='setGroupSelection(${idsJson}, this.checked); toggleChildrenGroup(${idsJson}, this.checked)'>
-            포함 여부
-            ${groupIds.length > 1 ? `<span style="font-size:11px; color:var(--text-light);">(쿼리 내 ${groupIds.length}곳에 동시 적용)</span>` : ""}
-          </label>
-          <code>${node.test}</code>
-        </div>`;
+              <div class="q-item ${nestedClass}" ${indentStyle}>
+                <label class="q-label">
+                  <span class="q-tag">IF</span>
+                  <input type="checkbox" onchange='setGroupSelection(${idsJson}, this.checked); toggleChildrenGroup(${idsJson}, this.checked)'>
+                  포함 여부
+                  ${groupIds.length > 1 ? `<span class="q-link-badge">🔗 쿼리 내 ${groupIds.length}곳에 동시 적용</span>` : ""}
+                </label>
+                <code>${node.test}</code>
+              </div>`;
+          } else {
+            // 그룹의 대표가 아닌 위치: 연동 안내 카드 (체크박스 없이, 위쪽 조건과 함께 제어됨을 표시)
+            html += `
+              <div class="q-item q-linked ${nestedClass}" ${indentStyle}>
+                <div class="q-label">
+                  <span class="q-tag q-tag-linked">🔗 연동</span>
+                  위쪽 동일 조건에 의해 함께 제어됩니다.
+                </div>
+                <code>${node.test}</code>
+              </div>`;
           }
         } else if (node.type === "CHOOSE") {
           let inner = "";
@@ -402,7 +415,6 @@
             </div>`;
         } else if (node.type === "FOREACH") {
           selections["foreach_" + node.id] = "1";
-
           html += `
             <div class="q-item ${nestedClass}" ${indentStyle}>
               <div class="q-label"><span class="q-tag">FOREACH</span> 반복 횟수</div>
@@ -420,7 +432,6 @@
             </div>`;
         }
 
-        // 태그 종류에 따라 depth를 늘려서 자식에게 전달
         const childDepth = [
           "IF",
           "CHOOSE",
@@ -443,6 +454,7 @@
         if (node.otherwise)
           childrenHtml += renderQuestions(node.otherwise, childDepth);
 
+        // IF 노드는 자식들을 흐림 처리 대상 div로 감쌈 (자식이 있을 때만 wrapper 생성)
         if (node.type === "IF") {
           if (childrenHtml.trim() !== "") {
             html += `<div class="q-children dimmed" id="children-${node.id}">${childrenHtml}</div>`;
